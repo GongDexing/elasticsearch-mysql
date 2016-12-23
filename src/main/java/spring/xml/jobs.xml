@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:p="http://www.springframework.org/schema/p"
+xmlns:util="http://www.springframework.org/schema/util"
+xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+	<!-- DATE:91,VARCHAR:12,INTEGER:4,SMALLINT:5,BIGINT:-5,TINYINT:-6,TIMESTAMP:93-->
+	<!-- 尽量保证每个数据表有个时间字段，用于增量同步，提高同步效率，每个job的params最好不要相同, step用于设置每次同步的数量，默认为1000条-->
+	<!-- 同步的字段必须包括id -->
+	<util:set id="jobs">
+		<bean class="cn.net.communion.sync.entity.JobInfo"
+			p:name="job1" 
+			p:index="data" 
+			p:type="book" 
+			p:cron="0/10 * * * * ?" 
+			p:sql="select id,author,title,publisher,words,summary,img,rating from tbl_book where updateTime > ?"
+			p:step="50000" 
+			p:params="sys.lastTime1"
+			p:paramTypes="12"/>	
+		<bean class="cn.net.communion.sync.entity.JobInfo"
+			p:name="job2" 
+			p:index="data" 
+			p:type="comment" 
+			p:cron="0/10 * * * * ?" 
+			p:sql="select id,comment from tbl_comment where time > ?" 
+			p:params="sys.lastTime2"
+			p:paramTypes="12"/>
+	</util:set>
+</beans>
